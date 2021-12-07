@@ -33,7 +33,7 @@ from .configuration_auto import ALL_PRETRAINED_CONFIG_ARCHIVE_MAP, AutoConfig
 from .configuration_utils import PretrainedConfig
 # from .configuration_xlm import XLMConfig
 from .data import SquadExample, squad_convert_examples_to_features
-from .file_utils import is_tf_available, is_torch_available
+from .file_utils import is_torch_available
 from .modelcard import ModelCard
 from .tokenization_auto import AutoTokenizer
 # from .tokenization_bert import BasicTokenizer
@@ -68,11 +68,11 @@ def get_framework(model=None):
     """ Select framework (TensorFlow/PyTorch) to use.
         If both frameworks are installed and no specific model is provided, defaults to using PyTorch.
     """
-    if is_tf_available() and is_torch_available() and model is not None and not isinstance(model, str):
+    if is_torch_available() and model is not None and not isinstance(model, str):
         # Both framework are available but the user supplied a model class instance.
         # Try to guess which framework to use from the model classname
         framework = "tf" if model.__class__.__name__.startswith("TF") else "pt"
-    elif not is_tf_available() and not is_torch_available():
+    elif not is_torch_available():
         raise RuntimeError(
             "At least one of TensorFlow 2.0 or PyTorch should be installed. "
             "To install TensorFlow 2.0, read the instructions at https://www.tensorflow.org/install/ "
@@ -941,7 +941,7 @@ class QuestionAnsweringPipeline(Pipeline):
 SUPPORTED_TASKS = {
     "feature-extraction": {
         "impl": FeatureExtractionPipeline,
-        "tf": TFAutoModel if is_tf_available() else None,
+        "tf":  None,
         "pt": AutoModel if is_torch_available() else None,
         "default": {
             "model": {"pt": "distilbert-base-cased", "tf": "distilbert-base-cased"},
@@ -951,7 +951,7 @@ SUPPORTED_TASKS = {
     },
     "sentiment-analysis": {
         "impl": TextClassificationPipeline,
-        "tf": TFAutoModelForSequenceClassification if is_tf_available() else None,
+        "tf": None,
         "pt": AutoModelForSequenceClassification if is_torch_available() else None,
         "default": {
             "model": {
@@ -964,7 +964,7 @@ SUPPORTED_TASKS = {
     },
     "ner": {
         "impl": NerPipeline,
-        "tf": TFAutoModelForTokenClassification if is_tf_available() else None,
+        "tf":  None,
         "pt": AutoModelForTokenClassification if is_torch_available() else None,
         "default": {
             "model": {
@@ -977,7 +977,7 @@ SUPPORTED_TASKS = {
     },
     "question-answering": {
         "impl": QuestionAnsweringPipeline,
-        "tf": TFAutoModelForQuestionAnswering if is_tf_available() else None,
+        "tf":  None,
         "pt": AutoModelForQuestionAnswering if is_torch_available() else None,
         "default": {
             "model": {"pt": "distilbert-base-cased-distilled-squad", "tf": "distilbert-base-cased-distilled-squad"},
@@ -987,7 +987,7 @@ SUPPORTED_TASKS = {
     },
     "fill-mask": {
         "impl": FillMaskPipeline,
-        "tf": TFAutoModelWithLMHead if is_tf_available() else None,
+        "tf":  None,
         "pt": AutoModelWithLMHead if is_torch_available() else None,
         "default": {
             "model": {"pt": "distilroberta-base", "tf": "distilroberta-base"},
